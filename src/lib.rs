@@ -1,4 +1,4 @@
-mod raytracer;
+pub mod raytracer;
 
 #[test]
 fn test() -> std::io::Result<()> {
