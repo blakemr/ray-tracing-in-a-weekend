@@ -5,7 +5,7 @@ pub mod shapes;
 
 use camera::Camera;
 use hittable::HitList;
-use image::{Pixel, Rgb, RgbImage};
+use image::{Rgb, RgbImage};
 use nalgebra::Vector3;
 use rand::{thread_rng, Rng};
 use ray::Ray;
@@ -16,19 +16,21 @@ fn test() -> std::io::Result<()> {
     make_image()
 }
 
-pub fn vec_color(color: &Vector3<f32>) -> Rgb<u8> {
-    fn scale_color(col: f32) -> u8 {
-        (col.clamp(0.0, 1.0) * u8::MAX as f32) as u8
+pub fn vec_color(color: &Vector3<f32>, samples: u32) -> [f32; 3] {
+    fn scale_color(col: f32) -> f32 {
+        col.clamp(0.0, 1.0) * u8::MAX as f32
     }
 
-    Rgb([
-        scale_color(color.x),
-        scale_color(color.y),
-        scale_color(color.z),
-    ])
+    let sam = 1.0 / samples as f32;
+
+    [
+        scale_color(color.x * sam),
+        scale_color(color.y * sam),
+        scale_color(color.z * sam),
+    ]
 }
 
-pub fn ray_color(ray: &Ray, world: &HitList) -> Rgb<u8> {
+pub fn ray_color(ray: &Ray, world: &HitList, samples: u32) -> [f32; 3] {
     let color: Vector3<f32>;
 
     match world.hit(ray, 0.0, f32::INFINITY) {
@@ -40,7 +42,7 @@ pub fn ray_color(ray: &Ray, world: &HitList) -> Rgb<u8> {
         }
     }
 
-    vec_color(&color)
+    vec_color(&color, samples)
 }
 
 pub fn make_image() -> std::io::Result<()> {
@@ -71,15 +73,23 @@ pub fn make_image() -> std::io::Result<()> {
     // Render
     let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
+    // I really hate this method of keeping it out of the pixel struct until the processing is done.
     for (x, y, pixel) in img.enumerate_pixels_mut() {
+        let mut pix: [f32; 3] = [0.0, 0.0, 0.0];
         for _ in 0..SAMPLES_PP {
-            let u = (x as f32 + rng.gen_range(0.01..1.0)) / IMAGE_WIDTH as f32;
-            let v = (y as f32 + rng.gen_range(0.01..1.0)) / IMAGE_HEIGHT as f32;
+            let u = (x as f32 + rng.gen_range(0.0..1.0)) / IMAGE_WIDTH as f32;
+            let v = (y as f32 + rng.gen_range(0.0..1.0)) / IMAGE_HEIGHT as f32;
 
             let ray = camera.cast_ray(u, v);
 
-            pixel.blend(&ray_color(&ray, &world));
+            let sam = ray_color(&ray, &world, SAMPLES_PP);
+
+            pix[0] += sam[0];
+            pix[1] += sam[1];
+            pix[2] += sam[2];
         }
+
+        *pixel = Rgb([pix[0] as u8, pix[1] as u8, pix[2] as u8]);
 
         if x == 0 {
             println!("{:.2} %", y as f32 / IMAGE_HEIGHT as f32 * 100.0)
