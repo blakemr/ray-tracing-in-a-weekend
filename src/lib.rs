@@ -4,43 +4,43 @@ pub mod ray;
 pub mod shapes;
 
 use camera::Camera;
-use image::{Rgb, RgbImage};
+use hittable::HitList;
+use image::{Pixel, Rgb, RgbImage};
 use nalgebra::Vector3;
+use rand::{thread_rng, Rng};
 use ray::Ray;
-use shapes::{sphere_hit, Sphere};
+use shapes::Sphere;
 
 #[test]
 fn test() -> std::io::Result<()> {
     make_image()
 }
 
-pub fn vec_color(vec: Vector3<f32>) -> Rgb<u8> {
+pub fn vec_color(color: &Vector3<f32>) -> Rgb<u8> {
+    fn scale_color(col: f32) -> u8 {
+        (col.clamp(0.0, 1.0) * u8::MAX as f32) as u8
+    }
+
     Rgb([
-        (vec.x * 256.0) as u8,
-        (vec.y * 256.0) as u8,
-        (vec.z * 256.0) as u8,
+        scale_color(color.x),
+        scale_color(color.y),
+        scale_color(color.z),
     ])
 }
 
-pub fn ray_color(ray: &Ray) -> Rgb<u8> {
-    let sphere = Sphere {
-        position: Vector3::<f32>::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-    };
+pub fn ray_color(ray: &Ray, world: &HitList) -> Rgb<u8> {
+    let color: Vector3<f32>;
 
-    let t = sphere_hit(&sphere, &ray);
-    if t > 0.0 {
-        let n = (ray.at(t) - Vector3::<f32>::new(0.0, 0.0, -1.0)).normalize();
-
-        return vec_color(n);
+    match world.hit(ray, 0.0, f32::INFINITY) {
+        Some(h) => color = 0.5 * h.normal,
+        None => {
+            let unit_dir: Vector3<f32> = ray.direction.normalize();
+            let t = 0.5 * (unit_dir.y + 1.0);
+            color = (1.0 - t) * Vector3::new(1.0, 1.0, 1.0) + t * Vector3::new(0.5, 0.7, 1.0);
+        }
     }
 
-    let unit_dir: Vector3<f32> = ray.direction.normalize();
-    let t = 0.5 * (unit_dir.y + 1.0);
-    let color: Vector3<f32> =
-        ((1.0 - t) * Vector3::new(1.0, 1.0, 1.0)) + (t * Vector3::new(0.5, 0.7, 1.0));
-
-    vec_color(color)
+    vec_color(&color)
 }
 
 pub fn make_image() -> std::io::Result<()> {
@@ -48,28 +48,42 @@ pub fn make_image() -> std::io::Result<()> {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
+    const SAMPLES_PP: u32 = 100;
+
+    // Sampling
+    let mut rng = thread_rng();
+
+    // World
+    let mut world = HitList::new();
+
+    world.add(Box::new(Sphere::new(
+        Vector3::<f32>::new(0.0, 0.0, -1.0),
+        0.5,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vector3::<f32>::new(0.0, -100.5, -1.0),
+        100.0,
+    )));
 
     // Camera
     let camera = Camera::default();
-
-    let top_left = camera.top_left();
-    let vertical = Vector3::<f32>::new(0.0, camera.height, 0.0);
-    let horizontal = Vector3::<f32>::new(camera.width, 0.0, 0.0);
 
     // Render
     let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        let u: f32 = x as f32 / IMAGE_WIDTH as f32;
-        let v: f32 = y as f32 / IMAGE_HEIGHT as f32;
+        for _ in 0..SAMPLES_PP {
+            let u = (x as f32 + rng.gen_range(0.01..1.0)) / IMAGE_WIDTH as f32;
+            let v = (y as f32 + rng.gen_range(0.01..1.0)) / IMAGE_HEIGHT as f32;
 
-        let origin: Vector3<f32> = camera.position;
-        let direction: Vector3<f32> =
-            top_left + (u as f32 * horizontal) - (v as f32 * vertical) - camera.position;
+            let ray = camera.cast_ray(u, v);
 
-        let ray = Ray { origin, direction };
+            pixel.blend(&ray_color(&ray, &world));
+        }
 
-        *pixel = ray_color(&ray)
+        if x == 0 {
+            println!("{:.2} %", y as f32 / IMAGE_HEIGHT as f32 * 100.0)
+        }
     }
 
     img.save("docs/testimage.png")

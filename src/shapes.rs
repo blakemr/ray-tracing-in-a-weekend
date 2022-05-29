@@ -2,9 +2,16 @@ use crate::hittable::{HitRecord, Hittable};
 use crate::Ray;
 use nalgebra::Vector3;
 
+#[derive(Clone)]
 pub struct Sphere {
     pub position: Vector3<f32>,
     pub radius: f32,
+}
+
+impl Sphere {
+    pub fn new(position: Vector3<f32>, radius: f32) -> Self {
+        Self { position, radius }
+    }
 }
 
 impl Hittable for Sphere {
@@ -46,20 +53,8 @@ impl Hittable for Sphere {
     fn normal(&self, p: &Vector3<f32>) -> Vector3<f32> {
         (p - self.position) / self.radius
     }
-}
 
-// TO REMOVE
-pub fn sphere_hit(sphere: &Sphere, ray: &Ray) -> f32 {
-    // nalgebra probably has some function to do this for me, or part of it.
-    let oc = ray.origin - sphere.position;
-    let a = ray.direction.magnitude_squared();
-    let b = oc.dot(&ray.direction);
-    let c = oc.magnitude_squared() - (sphere.radius * sphere.radius);
-    let discriminant = (b * b) - (a * c);
-
-    if discriminant < 0.0 {
-        return -1.0;
+    fn clone_dyn(&self) -> Box<dyn Hittable> {
+        Box::new(self.clone())
     }
-
-    (-b - discriminant.sqrt()) / a
 }
