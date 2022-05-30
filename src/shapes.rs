@@ -4,18 +4,18 @@ use nalgebra::Vector3;
 
 #[derive(Clone)]
 pub struct Sphere {
-    pub position: Vector3<f32>,
-    pub radius: f32,
+    pub position: Vector3<f64>,
+    pub radius: f64,
 }
 
 impl Sphere {
-    pub fn new(position: Vector3<f32>, radius: f32) -> Self {
+    pub fn new(position: Vector3<f64>, radius: f64) -> Self {
         Self { position, radius }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.position;
         let a = ray.direction.magnitude_squared();
         let b = oc.dot(&ray.direction);
@@ -50,7 +50,7 @@ impl Hittable for Sphere {
         })
     }
 
-    fn normal(&self, p: &Vector3<f32>) -> Vector3<f32> {
+    fn normal(&self, p: &Vector3<f64>) -> Vector3<f64> {
         (p - self.position) / self.radius
     }
 
