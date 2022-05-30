@@ -1,3 +1,5 @@
+use crate::materials::Dielectric;
+
 pub mod camera;
 pub mod hittable;
 pub mod materials;
@@ -25,14 +27,14 @@ fn make_an_image() -> std::io::Result<()> {
 
     let mut scene = Scene::new();
     let mat_ground = Rc::new(Diffuse::new(Vector3::<f64>::new(0.8, 0.8, 0.0)));
-    let mat_center = Rc::new(Diffuse::new(Vector3::<f64>::new(0.7, 0.3, 0.3)));
-    let mat_left = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.8, 0.8)));
-    let mat_right = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.6, 0.2)));
+    let mat_center = Rc::new(Dielectric::new(1.5));
+    let mat_left = Rc::new(Dielectric::new(1.5));
+    let mat_right = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.6, 0.2), 1.0));
 
     scene.add_sphere(0.0, 0.0, -1.0, 0.5, mat_center);
     scene.add_sphere(0.0, -100.5, -1.0, 100.0, mat_ground);
-    scene.add_sphere(1.0, 0.0, -1.0, 0.5, mat_left);
-    scene.add_sphere(-1.0, 0.0, -1.0, 0.5, mat_right);
+    scene.add_sphere(-1.0, 0.0, -1.0, 0.5, mat_left);
+    scene.add_sphere(1.0, 0.0, -1.0, 0.5, mat_right);
 
     let camera = Camera::default(ASPECT_RATIO, ZOOM);
 
