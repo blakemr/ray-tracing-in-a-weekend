@@ -10,11 +10,10 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn default() -> Camera {
-        let aspect_ratio = 16.0 / 9.0;
+    pub fn default(aspect_ratio: f32, zoom: f32) -> Camera {
         Camera {
-            width: 2.0 * aspect_ratio,
-            height: 2.0,
+            width: zoom * aspect_ratio,
+            height: zoom,
             focal_length: 1.0,
             position: Vector3::<f32>::zeros(),
         }

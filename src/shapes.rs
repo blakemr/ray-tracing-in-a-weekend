@@ -1,5 +1,5 @@
 use crate::hittable::{HitRecord, Hittable};
-use crate::Ray;
+use crate::ray::Ray;
 use nalgebra::Vector3;
 
 #[derive(Clone)]
