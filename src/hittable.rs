@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::materials::Scatter;
+use crate::materials::Material;
 use crate::ray::Ray;
 use nalgebra::Vector3;
 
@@ -8,13 +8,13 @@ use nalgebra::Vector3;
 pub struct HitRecord {
     pub point: Vector3<f64>,
     pub normal: Vector3<f64>,
-    pub material: Rc<dyn Scatter>,
+    pub material: Rc<dyn Material>,
     pub t: f64,
     pub front: bool,
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray, t: f64, normal_out: Vector3<f64>, mat: Rc<dyn Scatter>) -> HitRecord {
+    pub fn new(ray: &Ray, t: f64, normal_out: Vector3<f64>, mat: Rc<dyn Material>) -> HitRecord {
         let mut record = HitRecord {
             point: ray.at(t),
             normal: Vector3::<f64>::zeros(),

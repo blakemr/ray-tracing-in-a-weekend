@@ -10,6 +10,8 @@ pub mod utilities;
 #[test]
 fn make_an_image() -> std::io::Result<()> {
     use camera::Camera;
+    use materials::{Diffuse, Metal};
+    use nalgebra::Vector3;
     use render::Render;
     use scene::Scene;
     use std::rc::Rc;
@@ -17,13 +19,20 @@ fn make_an_image() -> std::io::Result<()> {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u64;
-    const SAMPLES_PP: u64 = 50;
+    const SAMPLES_PP: u64 = 80;
     const ZOOM: f64 = 2.0;
-    const BOUNCES: u64 = 5;
+    const BOUNCES: u64 = 10;
 
     let mut scene = Scene::new();
-    scene.add_sphere(0.0, 0.0, -1.0, 0.5);
-    scene.add_sphere(0.0, -100.5, -1.0, 100.0);
+    let mat_ground = Rc::new(Diffuse::new(Vector3::<f64>::new(0.8, 0.8, 0.0)));
+    let mat_center = Rc::new(Diffuse::new(Vector3::<f64>::new(0.7, 0.3, 0.3)));
+    let mat_left = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.8, 0.8)));
+    let mat_right = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.6, 0.2)));
+
+    scene.add_sphere(0.0, 0.0, -1.0, 0.5, mat_center);
+    scene.add_sphere(0.0, -100.5, -1.0, 100.0, mat_ground);
+    scene.add_sphere(1.0, 0.0, -1.0, 0.5, mat_left);
+    scene.add_sphere(-1.0, 0.0, -1.0, 0.5, mat_right);
 
     let camera = Camera::default(ASPECT_RATIO, ZOOM);
 

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::hittable::{HitRecord, Hittable};
-use crate::materials::Scatter;
+use crate::materials::Material;
 use crate::ray::Ray;
 use nalgebra::Vector3;
 
@@ -9,11 +9,11 @@ use nalgebra::Vector3;
 pub struct Sphere {
     pub position: Vector3<f64>,
     pub radius: f64,
-    pub material: Rc<dyn Scatter>,
+    pub material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(position: Vector3<f64>, radius: f64, material: Rc<dyn Scatter>) -> Self {
+    pub fn new(position: Vector3<f64>, radius: f64, material: Rc<dyn Material>) -> Self {
         Self {
             position,
             radius,

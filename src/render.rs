@@ -44,7 +44,7 @@ impl Render {
 
                 let ray = camera.cast_ray(u, v);
 
-                pixel_sum += scene.ray_color(&ray, &mut self.rng, self.max_ray_depth);
+                pixel_sum += scene.ray_color(&ray, self.max_ray_depth);
             }
 
             *pixel = Rgb(utilities::vec_to_color_array(
