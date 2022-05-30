@@ -12,6 +12,7 @@ fn make_an_image() -> std::io::Result<()> {
     use camera::Camera;
     use render::Render;
     use scene::Scene;
+    use std::rc::Rc;
 
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;

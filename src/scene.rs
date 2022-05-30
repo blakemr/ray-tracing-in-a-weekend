@@ -1,4 +1,7 @@
+use std::rc::Rc;
+
 use crate::hittable::HitList;
+use crate::materials::Scatter;
 use crate::ray::Ray;
 use crate::shapes::Sphere;
 use crate::utilities;
@@ -16,9 +19,9 @@ impl Scene {
         Scene { hittables }
     }
 
-    pub fn add_sphere(&mut self, x: f64, y: f64, z: f64, r: f64) {
+    pub fn add_sphere(&mut self, x: f64, y: f64, z: f64, r: f64, mat: Rc<dyn Scatter>) {
         self.hittables
-            .add(Box::new(Sphere::new(Vector3::<f64>::new(x, y, z), r)));
+            .add(Box::new(Sphere::new(Vector3::<f64>::new(x, y, z), r, mat)));
     }
 
     pub fn ray_color(&self, ray: &Ray, rng: &mut ThreadRng, bounces: u64) -> Vector3<f64> {

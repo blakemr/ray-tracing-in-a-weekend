@@ -1,4 +1,7 @@
+use std::rc::Rc;
+
 use crate::hittable::{HitRecord, Hittable};
+use crate::materials::Scatter;
 use crate::ray::Ray;
 use nalgebra::Vector3;
 
@@ -6,11 +9,16 @@ use nalgebra::Vector3;
 pub struct Sphere {
     pub position: Vector3<f64>,
     pub radius: f64,
+    pub material: Rc<dyn Scatter>,
 }
 
 impl Sphere {
-    pub fn new(position: Vector3<f64>, radius: f64) -> Self {
-        Self { position, radius }
+    pub fn new(position: Vector3<f64>, radius: f64, material: Rc<dyn Scatter>) -> Self {
+        Self {
+            position,
+            radius,
+            material,
+        }
     }
 }
 
@@ -38,7 +46,7 @@ impl Hittable for Sphere {
         }
 
         let normal_out = self.normal(&ray.at(root));
-        Some(HitRecord::new(ray, root, normal_out))
+        Some(HitRecord::new(ray, root, normal_out, self.material.clone()))
     }
 
     fn normal(&self, p: &Vector3<f64>) -> Vector3<f64> {
