@@ -1,5 +1,6 @@
 pub mod camera;
 pub mod hittable;
+pub mod materials;
 pub mod ray;
 pub mod render;
 pub mod scene;
@@ -15,9 +16,9 @@ fn make_an_image() -> std::io::Result<()> {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u64;
-    const SAMPLES_PP: u64 = 80;
+    const SAMPLES_PP: u64 = 50;
     const ZOOM: f64 = 2.0;
-    const BOUNCES: u64 = 50;
+    const BOUNCES: u64 = 5;
 
     let mut scene = Scene::new();
     scene.add_sphere(0.0, 0.0, -1.0, 0.5);

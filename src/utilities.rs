@@ -26,6 +26,16 @@ pub fn rand_point_in_unit_sphere(rng: &mut ThreadRng) -> Vector3<f64> {
     }
 }
 
+pub fn rand_pouint_in_hemisphere(rng: &mut ThreadRng, normal: Vector3<f64>) -> Vector3<f64> {
+    let point = rand_point_in_unit_sphere(rng);
+
+    if point.dot(&normal) > 0.0 {
+        point
+    } else {
+        -point
+    }
+}
+
 pub fn vec_to_color_array(color: &Vector3<f64>) -> [u8; 3] {
     fn scale_color(col: f64) -> u8 {
         (col.clamp(0.0, 1.0) * u8::MAX as f64) as u8

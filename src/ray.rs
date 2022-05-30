@@ -7,12 +7,17 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new_empty() -> Self {
+    pub fn new(origin: Vector3<f64>, direction: Vector3<f64>) -> Self {
+        Self { origin, direction }
+    }
+
+    pub fn default() -> Self {
         Ray {
             origin: Vector3::<f64>::zeros(),
             direction: Vector3::<f64>::zeros(),
         }
     }
+
     pub fn at(&self, t: f64) -> Vector3<f64> {
         self.origin + (t * self.direction)
     }

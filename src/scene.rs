@@ -22,31 +22,23 @@ impl Scene {
     }
 
     pub fn ray_color(&self, ray: &Ray, rng: &mut ThreadRng, bounces: u64) -> Vector3<f64> {
-        let mut r: Ray = ray.clone();
-
-        for i in 0..bounces {
-            let color_scale = (0.5 as f64).powf(i as f64);
-
-            match self.hittables.hit(&r, 0.0, f64::INFINITY) {
-                Some(hit) => {
-                    let target = hit.point + hit.normal + utilities::rand_point_in_unit_sphere(rng);
-
-                    let origin = hit.point;
-                    let direction = target - hit.point;
-                    r = Ray { origin, direction };
-                }
-                None => {
-                    let color_final = r.direction;
-                    let t = 0.5 * (color_final.normalize().y + 1.0);
-
-                    let white = Vector3::<f64>::new(1.0, 1.0, 1.0);
-                    let blue = Vector3::<f64>::new(0.5, 0.7, 1.0);
-
-                    return color_scale * white.lerp(&blue, t);
-                }
-            }
+        if bounces <= 0 {
+            return Vector3::<f64>::zeros();
         }
 
-        return Vector3::<f64>::zeros();
+        if let Some(hit) = self.hittables.hit(ray, 0.001, f64::INFINITY) {
+            let target = hit.point + utilities::rand_pouint_in_hemisphere(rng, hit.normal);
+            let r = Ray::new(hit.point, target - hit.point);
+
+            0.5 * self.ray_color(&r, rng, bounces - 1)
+        } else {
+            let unit_dir = ray.direction.normalize();
+            let t = 0.5 * (unit_dir.y + 1.0);
+
+            let white = Vector3::<f64>::new(1.0, 1.0, 1.0);
+            let blue = Vector3::<f64>::new(0.5, 0.7, 1.0);
+
+            return white.lerp(&blue, t);
+        }
     }
 }

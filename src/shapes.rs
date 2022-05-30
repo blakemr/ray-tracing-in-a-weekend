@@ -37,17 +37,8 @@ impl Hittable for Sphere {
             }
         }
 
-        let point = ray.at(root);
-        let normal = self.normal(&point);
-        let t = root;
-        let front = ray.direction.dot(&normal) > 0.0;
-
-        Some(HitRecord {
-            point,
-            normal,
-            t,
-            front,
-        })
+        let normal_out = self.normal(&ray.at(root));
+        Some(HitRecord::new(ray, root, normal_out))
     }
 
     fn normal(&self, p: &Vector3<f64>) -> Vector3<f64> {

@@ -10,13 +10,22 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn new() -> Self {
-        Self {
-            point: Vector3::<f64>::zeros(),
+    pub fn new(ray: &Ray, t: f64, normal_out: Vector3<f64>) -> HitRecord {
+        let mut record = HitRecord {
+            point: ray.at(t),
             normal: Vector3::<f64>::zeros(),
-            t: 0.0,
+            t: t,
             front: false,
-        }
+        };
+
+        record.set_normal(ray, normal_out);
+
+        record
+    }
+
+    pub fn set_normal(&mut self, ray: &Ray, normal_out: Vector3<f64>) {
+        self.front = ray.direction.dot(&normal_out) < 0.0;
+        self.normal = if self.front { normal_out } else { -normal_out }
     }
 }
 
