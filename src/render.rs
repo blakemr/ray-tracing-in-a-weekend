@@ -37,7 +37,7 @@ impl Render {
 
             for _ in 0..self.samples_per_pixel {
                 let u = (x as f32 + self.rng.gen_range(0.0..1.0)) / self.width as f32;
-                let v = (y as f32 + self.rng.gen_range(0.0..1.0)) / self.width as f32;
+                let v = (y as f32 + self.rng.gen_range(0.0..1.0)) / self.height as f32;
 
                 let ray = camera.cast_ray(u, v);
 

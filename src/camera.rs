@@ -20,8 +20,8 @@ impl Camera {
     }
 
     pub fn top_left(&self) -> Vector3<f32> {
-        let horizontal = Vector3::<f32>::new(self.width, 0.0, 0.0);
-        let vertical = Vector3::<f32>::new(0.0, self.height, 0.0);
+        let horizontal = self.horizontal_vec();
+        let vertical = self.vertical_vec();
 
         self.position - horizontal / 2.0 + vertical / 2.0
             - Vector3::<f32>::new(0.0, 0.0, self.focal_length)

@@ -16,12 +16,13 @@ fn make_an_image() -> std::io::Result<()> {
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
     const SAMPLES_PP: u32 = 80;
+    const ZOOM: f32 = 2.0;
 
     let mut scene = Scene::new();
     scene.add_sphere(0.0, 0.0, -1.0, 0.5);
     scene.add_sphere(0.0, -100.5, -1.0, 100.0);
 
-    let camera = Camera::default(ASPECT_RATIO, 2.0);
+    let camera = Camera::default(ASPECT_RATIO, ZOOM);
 
     let mut img = Render::new(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PP);
     img.render(&camera, &scene);
