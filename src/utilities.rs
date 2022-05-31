@@ -61,7 +61,7 @@ pub fn refraction(
 ) -> Vector3<f64> {
     let cos_theta = (-in_dir).dot(&normal).min(1.0);
     let r_out_perp = refraction_ratio * (in_dir + cos_theta * normal);
-    let r_out_parallel = -(1.0 - r_out_perp.magnitude().powi(2)).abs().sqrt() * normal;
+    let r_out_parallel = -(1.0 - r_out_perp.magnitude_squared()).abs().sqrt() * normal;
 
     r_out_perp + r_out_parallel
 }

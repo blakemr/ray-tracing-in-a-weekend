@@ -73,7 +73,7 @@ impl Material for Dielectric {
         let refraction_ratio = if hit.front {
             1.0 / self.refraction_index
         } else {
-            self.refraction_index
+            self.refraction_index / 1.0
         };
 
         let unit_dir = ray.direction.normalize();
