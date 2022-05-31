@@ -50,12 +50,16 @@ pub fn vec_to_color_array(color: &Vector3<f64>) -> [u8; 3] {
     ]
 }
 
+pub fn reflection(in_dir: Vector3<f64>, normal: Vector3<f64>) -> Vector3<f64> {
+    (in_dir - 2.0 * in_dir.dot(&normal) * normal).normalize()
+}
+
 pub fn refraction(
     in_dir: Vector3<f64>,
     normal: Vector3<f64>,
     refraction_ratio: f64,
 ) -> Vector3<f64> {
-    let cos_theta = (-1.0 * in_dir).dot(&normal).min(1.0);
+    let cos_theta = (-in_dir).dot(&normal).min(1.0);
     let r_out_perp = refraction_ratio * (in_dir + cos_theta * normal);
     let r_out_parallel = -(1.0 - r_out_perp.magnitude().powi(2)).abs().sqrt() * normal;
 

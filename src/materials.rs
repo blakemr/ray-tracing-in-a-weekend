@@ -44,8 +44,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Vector3<f64>, Ray)> {
-        let ray_reflect =
-            (ray.direction - 2.0 * ray.direction.dot(&hit.normal) * hit.normal).normalize();
+        let ray_reflect = utilities::reflection(ray.direction, hit.normal);
         let scattered = Ray::new(
             hit.point,
             ray_reflect + self.fuzz * utilities::rand_point_in_unit_sphere(),
@@ -79,9 +78,17 @@ impl Material for Dielectric {
 
         let unit_dir = ray.direction.normalize();
 
-        let refracted = utilities::refraction(unit_dir, hit.normal, refraction_ratio);
-        let scattered = Ray::new(hit.point, refracted);
+        let cos_theta = (-unit_dir).dot(&hit.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        Some((Vector3::<f64>::new(1.0, 1.0, 1.0), scattered))
+        let direction = if refraction_ratio * sin_theta > 1.0 {
+            utilities::reflection(unit_dir, hit.normal)
+        } else {
+            utilities::refraction(unit_dir, hit.normal, refraction_ratio)
+        };
+
+        let scattered = Ray::new(hit.point, direction);
+
+        Some((Vector3::<f64>::new(0.9, 0.9, 1.0), scattered))
     }
 }

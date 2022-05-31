@@ -29,6 +29,8 @@ fn make_an_image() -> std::io::Result<()> {
     let mat_ground = Rc::new(Diffuse::new(Vector3::<f64>::new(0.8, 0.8, 0.0)));
     let mat_center = Rc::new(Dielectric::new(1.5));
     let mat_left = Rc::new(Dielectric::new(1.5));
+    let mat_diffuse_pink = Rc::new(Diffuse::new(Vector3::<f64>::new(0.7, 0.3, 0.3)));
+    let mat_metal_low_fuzz = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.8, 0.8), 0.3));
     let mat_right = Rc::new(Metal::new(Vector3::<f64>::new(0.8, 0.6, 0.2), 1.0));
 
     scene.add_sphere(0.0, 0.0, -1.0, 0.5, mat_center);
