@@ -1,8 +1,10 @@
-use camera::Camera;
-use materials::{Dielectric, Diffuse, Metal};
-use ray_tracing_in_a_weekend::{materials::Material, utilities::Color, *};
-use render::Render;
-use scene::Scene;
+use ray_tracing_in_a_weekend::{
+    camera::Camera,
+    materials::{Dielectric, Diffuse, Material, Metal},
+    render::Render,
+    scene::Scene,
+    vector::Color,
+};
 use std::rc::Rc;
 
 fn main() {

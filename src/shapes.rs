@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::hittable::{HitRecord, Hittable};
 use crate::materials::Material;
 use crate::ray::Ray;
-use crate::utilities::Vec3;
+use crate::vector::Vec3;
 
 #[derive(Clone)]
 pub struct Sphere {

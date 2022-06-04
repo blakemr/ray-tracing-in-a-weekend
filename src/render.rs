@@ -1,7 +1,6 @@
 use crate::camera::Camera;
 use crate::scene::Scene;
-use crate::utilities;
-use crate::utilities::Color;
+use crate::vector::Color;
 
 use image::{Rgb, RgbImage};
 use rand::{prelude::ThreadRng, thread_rng, Rng};
@@ -47,7 +46,7 @@ impl Render {
                 pixel_sum += scene.ray_color(&ray, self.max_ray_depth);
             }
 
-            *pixel = Rgb(utilities::vec_to_color_array(
+            *pixel = Rgb(vec_to_color_array(
                 &(pixel_sum / self.samples_per_pixel as f64),
             ));
 
@@ -57,4 +56,16 @@ impl Render {
             }
         }
     }
+}
+
+pub fn vec_to_color_array(color: &Color) -> [u8; 3] {
+    fn scale_color(col: f64) -> u8 {
+        (col.clamp(0.0, 1.0) * u8::MAX as f64) as u8
+    }
+
+    [
+        scale_color(color.x.sqrt()),
+        scale_color(color.y.sqrt()),
+        scale_color(color.z.sqrt()),
+    ]
 }

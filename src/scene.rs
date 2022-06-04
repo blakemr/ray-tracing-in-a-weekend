@@ -4,7 +4,7 @@ use crate::hittable::HitList;
 use crate::materials::Material;
 use crate::ray::Ray;
 use crate::shapes::Sphere;
-use crate::utilities::{Color, Vec3};
+use crate::vector::{Color, Vec3};
 
 pub struct Scene {
     hittables: HitList,

@@ -5,5 +5,4 @@ pub mod ray;
 pub mod render;
 pub mod scene;
 pub mod shapes;
-pub mod utilities;
-mod vector;
+pub mod vector;

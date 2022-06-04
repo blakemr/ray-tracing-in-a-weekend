@@ -1,5 +1,5 @@
-use crate::utilities::Color;
-use crate::{hittable::HitRecord, ray::Ray, utilities};
+use crate::vector::{Color, RandVec, Reflection, Refraction, Vec3};
+use crate::{hittable::HitRecord, ray::Ray};
 
 pub trait Material {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)>;
@@ -19,7 +19,7 @@ impl Diffuse {
 impl Material for Diffuse {
     #[allow(unused)]
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
-        let mut scatter_direction = hit.normal + utilities::rand_point_in_unit_sphere();
+        let mut scatter_direction = hit.normal + Vec3::rand_in_unit_sphere();
         if scatter_direction.magnitude() < 1.0e-8 {
             scatter_direction = hit.normal;
         }
@@ -43,10 +43,10 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
-        let ray_reflect = utilities::reflection(ray.direction, hit.normal);
+        let ray_reflect = ray.direction.reflect(&hit.normal);
         let scattered = Ray::new(
             hit.point,
-            ray_reflect + self.fuzz * utilities::rand_point_in_unit_sphere(),
+            ray_reflect + self.fuzz * Vec3::rand_in_unit_sphere(),
         );
 
         if scattered.direction.dot(&hit.normal) > 0.0 {
@@ -75,15 +75,15 @@ impl Material for Dielectric {
             self.refraction_index / 1.0
         };
 
-        let unit_dir = ray.direction.normalize();
+        let unit_dir: Vec3 = ray.direction.normalize();
 
-        let cos_theta = (-unit_dir).dot(&hit.normal).min(1.0);
+        let cos_theta: f64 = (-unit_dir).dot(&hit.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
         let direction = if refraction_ratio * sin_theta > 1.0 {
-            utilities::reflection(unit_dir, hit.normal)
+            unit_dir.reflect(&hit.normal)
         } else {
-            utilities::refraction(unit_dir, hit.normal, refraction_ratio)
+            unit_dir.refract(&hit.normal, refraction_ratio)
         };
 
         let scattered = Ray::new(hit.point, direction);
