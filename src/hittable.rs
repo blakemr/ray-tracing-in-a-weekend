@@ -2,22 +2,22 @@ use std::rc::Rc;
 
 use crate::materials::Material;
 use crate::ray::Ray;
-use nalgebra::Vector3;
+use crate::utilities::Vec3;
 
 #[derive(Clone)]
 pub struct HitRecord {
-    pub point: Vector3<f64>,
-    pub normal: Vector3<f64>,
+    pub point: Vec3,
+    pub normal: Vec3,
     pub material: Rc<dyn Material>,
     pub t: f64,
     pub front: bool,
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray, t: f64, normal_out: Vector3<f64>, mat: Rc<dyn Material>) -> HitRecord {
+    pub fn new(ray: &Ray, t: f64, normal_out: Vec3, mat: Rc<dyn Material>) -> HitRecord {
         let mut record = HitRecord {
             point: ray.at(t),
-            normal: Vector3::<f64>::zeros(),
+            normal: Vec3::zeros(),
             material: mat,
             t: t,
             front: false,
@@ -28,7 +28,7 @@ impl HitRecord {
         record
     }
 
-    pub fn set_normal(&mut self, ray: &Ray, normal_out: Vector3<f64>) {
+    pub fn set_normal(&mut self, ray: &Ray, normal_out: Vec3) {
         self.front = ray.direction.dot(&normal_out) < 0.0;
         self.normal = if self.front { normal_out } else { -normal_out }
     }
@@ -36,7 +36,7 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
-    fn normal(&self, p: &Vector3<f64>) -> Vector3<f64>;
+    fn normal(&self, p: &Vec3) -> Vec3;
     fn clone_dyn(&self) -> Box<dyn Hittable>;
 }
 

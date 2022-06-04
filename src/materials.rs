@@ -1,25 +1,24 @@
-use nalgebra::Vector3;
-
+use crate::utilities::Color;
 use crate::{hittable::HitRecord, ray::Ray, utilities};
 
 pub trait Material {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Vector3<f64>, Ray)>;
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)>;
 }
 
 // Lambertian
 pub struct Diffuse {
-    albedo: Vector3<f64>,
+    albedo: Color,
 }
 
 impl Diffuse {
-    pub fn new(albedo: Vector3<f64>) -> Self {
+    pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
 }
 
 impl Material for Diffuse {
     #[allow(unused)]
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Vector3<f64>, Ray)> {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
         let mut scatter_direction = hit.normal + utilities::rand_point_in_unit_sphere();
         if scatter_direction.magnitude() < 1.0e-8 {
             scatter_direction = hit.normal;
@@ -32,18 +31,18 @@ impl Material for Diffuse {
 }
 
 pub struct Metal {
-    albedo: Vector3<f64>,
+    albedo: Color,
     fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Vector3<f64>, fuzz: f64) -> Self {
+    pub fn new(albedo: Color, fuzz: f64) -> Self {
         Self { albedo, fuzz }
     }
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Vector3<f64>, Ray)> {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
         let ray_reflect = utilities::reflection(ray.direction, hit.normal);
         let scattered = Ray::new(
             hit.point,
@@ -69,7 +68,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Vector3<f64>, Ray)> {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
         let refraction_ratio = if hit.front {
             1.0 / self.refraction_index
         } else {
@@ -89,6 +88,6 @@ impl Material for Dielectric {
 
         let scattered = Ray::new(hit.point, direction);
 
-        Some((Vector3::<f64>::new(0.9, 0.9, 1.0), scattered))
+        Some((Color::new(0.9, 0.9, 1.0), scattered))
     }
 }

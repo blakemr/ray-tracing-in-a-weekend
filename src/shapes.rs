@@ -3,17 +3,17 @@ use std::rc::Rc;
 use crate::hittable::{HitRecord, Hittable};
 use crate::materials::Material;
 use crate::ray::Ray;
-use nalgebra::Vector3;
+use crate::utilities::Vec3;
 
 #[derive(Clone)]
 pub struct Sphere {
-    pub position: Vector3<f64>,
+    pub position: Vec3,
     pub radius: f64,
     pub material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(position: Vector3<f64>, radius: f64, material: Rc<dyn Material>) -> Self {
+    pub fn new(position: Vec3, radius: f64, material: Rc<dyn Material>) -> Self {
         Self {
             position,
             radius,
@@ -49,7 +49,7 @@ impl Hittable for Sphere {
         Some(HitRecord::new(ray, root, normal_out, self.material.clone()))
     }
 
-    fn normal(&self, p: &Vector3<f64>) -> Vector3<f64> {
+    fn normal(&self, p: &Vec3) -> Vec3 {
         (p - self.position) / self.radius
     }
 

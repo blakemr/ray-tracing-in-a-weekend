@@ -1,9 +1,9 @@
 use crate::camera::Camera;
 use crate::scene::Scene;
 use crate::utilities;
+use crate::utilities::Color;
 
 use image::{Rgb, RgbImage};
-use nalgebra::Vector3;
 use rand::{prelude::ThreadRng, thread_rng, Rng};
 
 pub struct Render {
@@ -36,7 +36,7 @@ impl Render {
 
     pub fn render(&mut self, camera: &Camera, scene: &Scene) {
         for (x, y, pixel) in self.image.enumerate_pixels_mut() {
-            let mut pixel_sum = Vector3::<f64>::zeros();
+            let mut pixel_sum = Color::zeros();
 
             for _ in 0..self.samples_per_pixel {
                 let u = (x as f64 + self.rng.gen_range(0.0..1.0)) / self.width as f64;

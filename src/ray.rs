@@ -1,24 +1,24 @@
-use nalgebra::Vector3;
+use crate::utilities::Vec3;
 
 #[derive(Clone, Copy)]
 pub struct Ray {
-    pub origin: Vector3<f64>,
-    pub direction: Vector3<f64>,
+    pub origin: Vec3,
+    pub direction: Vec3,
 }
 
 impl Ray {
-    pub fn new(origin: Vector3<f64>, direction: Vector3<f64>) -> Self {
+    pub fn new(origin: Vec3, direction: Vec3) -> Self {
         Self { origin, direction }
     }
 
     pub fn default() -> Self {
         Ray {
-            origin: Vector3::<f64>::zeros(),
-            direction: Vector3::<f64>::zeros(),
+            origin: Vec3::zeros(),
+            direction: Vec3::zeros(),
         }
     }
 
-    pub fn at(&self, t: f64) -> Vector3<f64> {
+    pub fn at(&self, t: f64) -> Vec3 {
         self.origin + (t * self.direction)
     }
 }
