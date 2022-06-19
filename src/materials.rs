@@ -58,12 +58,16 @@ impl Material for Metal {
 }
 
 pub struct Dielectric {
+    albedo: Color,
     refraction_index: f64,
 }
 
 impl Dielectric {
     pub fn new(refraction_index: f64) -> Self {
-        Self { refraction_index }
+        Self {
+            albedo: Color::new(1.0, 1.0, 1.0),
+            refraction_index,
+        }
     }
 }
 
@@ -72,22 +76,27 @@ impl Material for Dielectric {
         let refraction_ratio = if hit.front {
             1.0 / self.refraction_index
         } else {
-            self.refraction_index / 1.0
+            self.refraction_index
         };
 
-        let unit_dir: Vec3 = ray.direction.normalize();
+        let unit_dir = ray.direction.normalize();
 
-        let cos_theta: f64 = (-unit_dir).dot(&hit.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+        let refracted = unit_dir.refract(&hit.normal, refraction_ratio);
 
-        let direction = if refraction_ratio * sin_theta > 1.0 {
-            unit_dir.reflect(&hit.normal)
-        } else {
-            unit_dir.refract(&hit.normal, refraction_ratio)
-        };
+        // 0, 0, 0 -> -1.4, 0.5, -1 @ 0.7
+        // refract: 0.6, so expect output to look like;
 
-        let scattered = Ray::new(hit.point, direction);
+        // let cos_theta = (-unit_dir).dot(&hit.normal).min(1.0);
+        // let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        Some((Color::new(0.9, 0.9, 1.0), scattered))
+        // let direction = if refraction_ratio * sin_theta > 1.0 {
+        //     unit_dir.reflect(&hit.normal)
+        // } else {
+        //     unit_dir.refract(&hit.normal, refraction_ratio)
+        // };
+
+        let scattered = Ray::new(hit.point, refracted);
+
+        Some((self.albedo, scattered))
     }
 }

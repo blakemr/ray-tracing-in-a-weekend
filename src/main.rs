@@ -11,9 +11,9 @@ fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u64;
-    const SAMPLES_PP: u64 = 80;
+    const SAMPLES_PP: u64 = 40;
     const ZOOM: f64 = 2.0;
-    const BOUNCES: u64 = 10;
+    const BOUNCES: u64 = 5;
 
     let mut scene = Scene::new();
     let mat_ground = get_mat(Materials::DiffuseYellow);
@@ -33,6 +33,7 @@ fn main() {
     img.save("docs/testimage.png");
 }
 
+#[allow(dead_code)]
 enum Materials {
     DiffuseYellow,
     DielectricClear,

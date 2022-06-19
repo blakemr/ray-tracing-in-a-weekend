@@ -14,20 +14,6 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray, t: f64, normal_out: Vec3, mat: Rc<dyn Material>) -> HitRecord {
-        let mut record = HitRecord {
-            point: ray.at(t),
-            normal: Vec3::zeros(),
-            material: mat,
-            t: t,
-            front: false,
-        };
-
-        record.set_normal(ray, normal_out);
-
-        record
-    }
-
     pub fn set_normal(&mut self, ray: &Ray, normal_out: Vec3) {
         self.front = ray.direction.dot(&normal_out) < 0.0;
         self.normal = if self.front { normal_out } else { -normal_out }

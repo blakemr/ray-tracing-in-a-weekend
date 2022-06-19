@@ -25,10 +25,12 @@ impl Sphere {
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.position;
+
         let a = ray.direction.magnitude_squared();
-        let b = oc.dot(&ray.direction);
-        let c = oc.magnitude_squared() - (self.radius * self.radius);
-        let discriminant = (b * b) - (a * c);
+        let half_b = oc.dot(&ray.direction);
+        let c = oc.magnitude_squared() - self.radius.powi(2);
+
+        let discriminant = half_b.powi(2) - (a * c);
 
         if discriminant < 0.0 {
             return None;
@@ -37,16 +39,28 @@ impl Hittable for Sphere {
         let dsqrt = discriminant.sqrt();
 
         // Find the first root in the given range
-        let root = (-b - dsqrt) / a;
-        if t_min > root || root > t_max {
-            let root = (-b + dsqrt) / a;
-            if t_min > root || root > t_max {
+        let mut root = (-half_b - dsqrt) / a;
+        if root < t_min || t_max < root {
+            root = (-half_b + dsqrt) / a;
+            if root < t_min || t_max < root {
                 return None;
             }
         }
 
-        let normal_out = self.normal(&ray.at(root));
-        Some(HitRecord::new(ray, root, normal_out, self.material.clone()))
+        let p = ray.at(root);
+
+        let mut rec = HitRecord {
+            point: p,
+            t: root,
+            normal: Vec3::zeros(),
+            material: self.material.clone(),
+            front: false,
+        };
+
+        let normal_out = (rec.point - self.position) / self.radius;
+        rec.set_normal(ray, normal_out);
+
+        Some(rec)
     }
 
     fn normal(&self, p: &Vec3) -> Vec3 {
