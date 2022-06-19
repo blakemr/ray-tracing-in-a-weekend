@@ -17,14 +17,16 @@ fn main() {
 
     let mut scene = Scene::new();
     let mat_ground = get_mat(Materials::DiffuseYellow);
-    let mat_center = get_mat(Materials::DielectricClear);
+    let mat_center = get_mat(Materials::DiffusePink);
     let mat_left = get_mat(Materials::DielectricClear);
-    let mat_right = get_mat(Materials::MetalHighFuzz);
+    let mat_right = get_mat(Materials::MetalLowFuzz);
 
     scene.add_sphere(0.0, 0.0, -1.0, 0.5, mat_center);
     scene.add_sphere(0.0, -100.5, -1.0, 100.0, mat_ground);
     scene.add_sphere(-1.0, 0.0, -1.0, 0.5, mat_left);
     scene.add_sphere(1.0, 0.0, -1.0, 0.5, mat_right);
+
+    //scene.add_sphere(-1.0, 0.0, -1.0, -0.4, get_mat(Materials::DielectricClear));
 
     let camera = Camera::default(ASPECT_RATIO, ZOOM);
 

@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::vector::{Color, RandVec, Reflection, Refraction, Vec3};
 use crate::{hittable::HitRecord, ray::Ray};
 
@@ -69,6 +71,12 @@ impl Dielectric {
             refraction_index,
         }
     }
+
+    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+        // Schlick's approximation
+        let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Material for Dielectric {
@@ -81,21 +89,20 @@ impl Material for Dielectric {
 
         let unit_dir = ray.direction.normalize();
 
-        let refracted = unit_dir.refract(&hit.normal, refraction_ratio);
+        let cos_theta = (-unit_dir).dot(&hit.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        // 0, 0, 0 -> -1.4, 0.5, -1 @ 0.7
-        // refract: 0.6, so expect output to look like;
+        let mut rng = rand::thread_rng();
+        let cannot_refract = refraction_ratio * sin_theta > 1.0;
+        let will_reflect = rng.gen::<f64>() < Self::reflectance(cos_theta, refraction_ratio);
 
-        // let cos_theta = (-unit_dir).dot(&hit.normal).min(1.0);
-        // let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+        let direction = if cannot_refract || will_reflect {
+            unit_dir.reflect(&hit.normal)
+        } else {
+            unit_dir.refract(&hit.normal, refraction_ratio)
+        };
 
-        // let direction = if refraction_ratio * sin_theta > 1.0 {
-        //     unit_dir.reflect(&hit.normal)
-        // } else {
-        //     unit_dir.refract(&hit.normal, refraction_ratio)
-        // };
-
-        let scattered = Ray::new(hit.point, refracted);
+        let scattered = Ray::new(hit.point, direction);
 
         Some((self.albedo, scattered))
     }
